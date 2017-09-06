@@ -12,7 +12,6 @@
     "tessereact": "*"
   },
   "bin": {
-    "tessereact-start": "./bin/tessereact-start.js",
-    "tessereact-init": "./bin/tessereact-init.js"
+    "tessereact-start": "./bin/tessereact-start.js"
   }
 }
