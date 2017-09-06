@@ -4,14 +4,14 @@
   "main": "index.js",
   "author": "Eduard Tsech",
   "license": "MIT",
-  "dependencies": {
-    "multi-entry-loader": "^1.1.2"
-  },
   "peerDependencies": {
     "react-scripts": "^1.0.11",
     "tessereact": "*"
   },
   "bin": {
     "tessereact-start": "./bin/tessereact-start.js"
+  },
+  "dependencies": {
+    "virtual-module-webpack-plugin": "^0.3.0"
   }
 }
