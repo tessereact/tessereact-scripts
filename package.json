@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "author": "Eduard Tsech",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "peerDependencies": {
     "react-scripts": "^1.0.11",
     "tessereact": "*"
