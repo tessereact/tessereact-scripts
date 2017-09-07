@@ -30,10 +30,10 @@ const chalk = require('chalk')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const clearConsole = require('react-dev-utils/clearConsole')
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages')
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles')
 const {
   choosePort,
-  createCompiler,
   prepareProxy,
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils')
@@ -67,10 +67,9 @@ choosePort(HOST, DEFAULT_PORT)
       return
     }
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
-    const appName = require(paths.appPackageJson).name
     const urls = prepareUrls(protocol, HOST, port)
-    // Create a webpack compiler that is configured with custom messages.
-    const compiler = createCompiler(webpack, config, appName, urls, useYarn)
+    // Create a webpack compiler
+    const compiler = createCompiler(webpack, config)
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy
     const proxyConfig = prepareProxy(proxySetting, paths.appPublic)
@@ -93,6 +92,12 @@ choosePort(HOST, DEFAULT_PORT)
       // Run Tessereact server on a separate port.
       choosePort(HOST, TESSEREACT_DEFAULT_PORT)
         .then(tessereactServerPort => {
+          const appName = require(paths.appPackageJson).name
+          const tessereactServerUrls = prepareUrls(protocol, HOST, tessereactServerPort)
+
+          // Configure webpack compiler with custom messages
+          printInstructionsWhenReady(compiler, appName, tessereactServerUrls, useYarn)
+
           const tessereactConfig = {
             port: tessereactServerPort,
             snapshots_path: 'snapshots',
@@ -120,3 +125,104 @@ choosePort(HOST, DEFAULT_PORT)
     }
     process.exit(1)
   })
+
+function createCompiler (webpack, config) {
+  // "Compiler" is a low-level interface to Webpack.
+  // It lets us listen to some events and provide our own custom messages.
+  let compiler
+  try {
+    compiler = webpack(config)
+  } catch (err) {
+    console.log(chalk.red('Failed to compile.'))
+    console.log()
+    console.log(err.message || err)
+    console.log()
+    process.exit(1)
+  }
+
+  // "invalid" event fires when you have changed a file, and Webpack is
+  // recompiling a bundle. WebpackDevServer takes care to pause serving the
+  // bundle, so if you refresh, it'll wait instead of serving the old one.
+  // "invalid" is short for "bundle invalidated", it doesn't imply any errors.
+  compiler.plugin('invalid', () => {
+    if (isInteractive) {
+      clearConsole()
+    }
+    console.log('Compiling...')
+  })
+
+  return compiler
+}
+
+function printInstructionsWhenReady (compiler, appName, urls, useYarn) {
+  let isFirstCompile = true
+
+  // "done" event fires when Webpack has finished recompiling the bundle.
+  // Whether or not you have warnings or errors, you will get this event.
+  compiler.plugin('done', stats => {
+    if (isInteractive) {
+      clearConsole()
+    }
+
+    // We have switched off the default Webpack output in WebpackDevServer
+    // options so we are going to "massage" the warnings and errors and present
+    // them in a readable focused way.
+    const messages = formatWebpackMessages(stats.toJson({}, true))
+    const isSuccessful = !messages.errors.length && !messages.warnings.length
+    if (isSuccessful) {
+      console.log(chalk.green('Compiled successfully!'))
+    }
+    if (isSuccessful && (isInteractive || isFirstCompile)) {
+      printInstructions(appName, urls, useYarn)
+    }
+    isFirstCompile = false
+
+    // If errors exist, only show errors.
+    if (messages.errors.length) {
+      // Only keep the first error. Others are often indicative
+      // of the same problem, but confuse the reader with noise.
+      if (messages.errors.length > 1) {
+        messages.errors.length = 1
+      }
+      console.log(chalk.red('Failed to compile.\n'))
+      console.log(messages.errors.join('\n\n'))
+      return
+    }
+
+    // Show warnings if no errors were found.
+    if (messages.warnings.length) {
+      console.log(chalk.yellow('Compiled with warnings.\n'))
+      console.log(messages.warnings.join('\n\n'))
+
+      // Teach some ESLint tricks.
+      console.log(
+        '\nSearch for the ' +
+          chalk.underline(chalk.yellow('keywords')) +
+          ' to learn more about each warning.'
+      )
+      console.log(
+        'To ignore, add ' +
+          chalk.cyan('// eslint-disable-next-line') +
+          ' to the line before.\n'
+      )
+    }
+  })
+}
+
+function printInstructions (appName, urls, useYarn) {
+  console.log()
+  console.log(`You can now view the Tessereact UI of ${chalk.bold(appName)} in the browser.`)
+  console.log()
+
+  if (urls.lanUrlForTerminal) {
+    console.log(
+      `  ${chalk.bold('Local:')}            ${urls.localUrlForTerminal}`
+    )
+    console.log(
+      `  ${chalk.bold('On Your Network:')}  ${urls.lanUrlForTerminal}`
+    )
+  } else {
+    console.log(`  ${urls.localUrlForTerminal}`)
+  }
+  console.log()
+}
