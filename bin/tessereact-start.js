@@ -41,7 +41,7 @@ const openBrowser = require('react-dev-utils/openBrowser')
 const paths = require('react-scripts/config/paths')
 const config = require('../config/webpack.config.tessereact')
 const createDevServerConfig = require('react-scripts/config/webpackDevServer.config')
-const tessereactServer = require('tessereact/bin/_lib/server')
+const tessereactServer = require('tessereact/server')
 
 const useYarn = fs.existsSync(paths.yarnLockFile)
 const isInteractive = process.stdout.isTTY
