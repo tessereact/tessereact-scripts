@@ -46,6 +46,13 @@ const tessereactServer = require('tessereact/server')
 const useYarn = fs.existsSync(paths.yarnLockFile)
 const isInteractive = process.stdout.isTTY
 
+let userConfig = {}
+try {
+  const userConfig = require(path.join(fs.realpathSync(process.cwd()), process.env.TESTSHOT_CONFIG || 'testshot.config.json'))
+} catch (e) {
+  // User config not found
+}
+
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1)
@@ -98,11 +105,11 @@ choosePort(HOST, DEFAULT_PORT)
           // Configure webpack compiler with custom messages
           printInstructionsWhenReady(compiler, appName, tessereactServerUrls, useYarn)
 
-          const tessereactConfig = {
+          const tessereactConfig = Object.assign({}, {
             port: tessereactServerPort,
             snapshots_path: 'snapshots',
             entry_url: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js')
-          }
+          }, userConfig)
 
           tessereactServer(process.cwd(), tessereactConfig, () => {
             openBrowser(`http://localhost:${tessereactServerPort}`)
