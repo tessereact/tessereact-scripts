@@ -7,10 +7,10 @@ const appDirectory = fs.realpathSync(process.cwd());
 const srcDirectory = path.join(appDirectory, './src')
 
 const tessereactEntry = `
-const cssContext = require.context('${srcDirectory}', true, ${/.css$/})
+const cssContext = require.context('${srcDirectory}', true, ${/\.css$/})
 cssContext.keys().forEach(cssContext)
 
-const scenariosContext = require.context('${srcDirectory}', true, ${/\/scenarios\.jsx?$/})
+const scenariosContext = require.context('${srcDirectory}', true, ${/[/.]scenarios?\.jsx?$/})
 scenariosContext.keys().forEach(scenariosContext)
 `
 
