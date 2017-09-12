@@ -14,7 +14,7 @@ const scenariosContext = require.context('${srcDirectory}', true, ${/\/scenarios
 scenariosContext.keys().forEach(scenariosContext)
 `
 
-const testshotConfig = Object.assign({}, devConfig, {
+const tessereactConfig = Object.assign({}, devConfig, {
   entry: [
     ...devConfig.entry.slice(0, -1),
 
@@ -38,4 +38,4 @@ const testshotConfig = Object.assign({}, devConfig, {
   ]
 })
 
-module.exports = testshotConfig
+module.exports = tessereactConfig

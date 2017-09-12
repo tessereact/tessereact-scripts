@@ -48,7 +48,7 @@ const isInteractive = process.stdout.isTTY
 
 let userConfig = {}
 try {
-  const userConfig = require(path.join(fs.realpathSync(process.cwd()), process.env.TESTSHOT_CONFIG || 'testshot.config.json'))
+  const userConfig = require(path.join(fs.realpathSync(process.cwd()), process.env.TESSEREACT_CONFIG || 'tessereact.config.json'))
 } catch (e) {
   // User config not found
 }
@@ -107,8 +107,9 @@ choosePort(HOST, DEFAULT_PORT)
 
           const tessereactConfig = Object.assign({}, {
             port: tessereactServerPort,
-            snapshots_path: 'snapshots',
-            entry_url: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js')
+            snapshotsPath: 'snapshots',
+            entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js'),
+            cacheCSS: true
           }, userConfig)
 
           tessereactServer(process.cwd(), tessereactConfig, () => {
