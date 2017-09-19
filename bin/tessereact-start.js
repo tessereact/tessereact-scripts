@@ -62,19 +62,16 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3001
 const HOST = process.env.HOST || '0.0.0.0'
 
-// Default port for Tessereact server
-const TESSEREACT_DEFAULT_PORT = 3002
-
 // We attempt to use the default port but if it is busy, we offer the user to
 // run on a different port. `detect()` Promise resolves to the next free port.
-choosePort(HOST, DEFAULT_PORT)
-  .then(port => {
-    if (port == null) {
+choosePorts(HOST, DEFAULT_PORT)
+  .then({webpackPort, serverPort, chromedriverPort} => {
+    if (webpackPort == null || serverPort == null || chromedriverPort == null) {
       // We have not found a port.
       return
     }
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
-    const urls = prepareUrls(protocol, HOST, port)
+    const urls = prepareUrls(protocol, HOST, webpackPort)
     // Create a webpack compiler
     const compiler = createCompiler(webpack, config)
     // Load proxy config
@@ -87,7 +84,7 @@ choosePort(HOST, DEFAULT_PORT)
     )
     const devServer = new WebpackDevServer(compiler, serverConfig)
     // Launch WebpackDevServer.
-    devServer.listen(port, HOST, err => {
+    devServer.listen(webpackPort, HOST, err => {
       if (err) {
         return console.log(err)
       }
@@ -96,26 +93,23 @@ choosePort(HOST, DEFAULT_PORT)
       }
       console.log(chalk.cyan('Starting the development server...\n'))
 
-      // Run Tessereact server on a separate port.
-      choosePort(HOST, TESSEREACT_DEFAULT_PORT)
-        .then(tessereactServerPort => {
-          const appName = require(paths.appPackageJson).name
-          const tessereactServerUrls = prepareUrls(protocol, HOST, tessereactServerPort)
+      const appName = require(paths.appPackageJson).name
+      const tessereactServerUrls = prepareUrls(protocol, HOST, serverPort)
 
-          // Configure webpack compiler with custom messages
-          printInstructionsWhenReady(compiler, appName, tessereactServerUrls, useYarn)
+      // Configure webpack compiler with custom messages
+      printInstructionsWhenReady(compiler, appName, tessereactServerUrls, useYarn)
 
-          const tessereactConfig = Object.assign({}, {
-            port: tessereactServerPort,
-            snapshotsPath: 'snapshots',
-            entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js'),
-            cacheCSS: true
-          }, userConfig)
+      const tessereactConfig = Object.assign({}, {
+        port: serverPort,
+        snapshotsPath: 'snapshots',
+        entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js'),
+        cacheCSS: true,
+        chromedriverPort
+      }, userConfig)
 
-          tessereactServer(process.cwd(), tessereactConfig, () => {
-            openBrowser(`http://localhost:${tessereactServerPort}`)
-          })
-        })
+      tessereactServer(process.cwd(), tessereactConfig, () => {
+        openBrowser(`http://localhost:${serverPort}`)
+      })
     })
 
     const signals = ['SIGINT', 'SIGTERM']
@@ -233,4 +227,25 @@ function printInstructions (appName, urls, useYarn) {
     console.log(`  ${urls.localUrlForTerminal}`)
   }
   console.log()
+}
+
+function choosePorts (host, defaultPort) {
+  let webpackPort
+  let serverPort
+  return choosePort(host, defaultPort)
+    .then(port => {
+      webpackPort = port
+      return choosePort(host, port + 1)
+    })
+    .then(port => {
+      serverPort = port
+      return choosePort(host, port + 1)
+    })
+    .then(chromedriverPort => {
+      return {
+        webpackPort,
+        serverPort,
+        chromedriverPort
+      }
+    })
 }
