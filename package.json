@@ -1,9 +1,9 @@
 {
   "name": "tessereact-scripts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "author": "Eduard Tsech",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "peerDependencies": {
     "react-scripts": "^1.0.11",
     "tessereact": "*"
