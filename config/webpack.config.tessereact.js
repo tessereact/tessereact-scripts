@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const VirtualModulePlugin = require('virtual-module-webpack-plugin')
 
-const appDirectory = fs.realpathSync(process.cwd());
+const appDirectory = fs.realpathSync(process.cwd())
 const srcDirectory = path.join(appDirectory, './src')
 
 const tessereactEntry = `

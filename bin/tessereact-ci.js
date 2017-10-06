@@ -4,13 +4,15 @@
  * Copyright (c) 2017-present, Facebook, Inc. and Tessereact authors.
  * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
+ * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
 // Do this as the first thing so that any code reading it knows the right env.
 process.env.BABEL_ENV = 'development'
 process.env.NODE_ENV = 'development'
+
+process.env.CI = true
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -30,13 +32,11 @@ const url = require('url')
 const chalk = require('chalk')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
-const clearConsole = require('react-dev-utils/clearConsole')
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles')
 const {
   prepareProxy,
   prepareUrls
 } = require('react-dev-utils/WebpackDevServerUtils')
-const openBrowser = require('react-dev-utils/openBrowser')
 const paths = require('react-scripts/config/paths')
 const config = require('../config/webpack.config.tessereact')
 const createDevServerConfig = require('react-scripts/config/webpackDevServer.config')
@@ -44,8 +44,6 @@ const tessereactServer = require('tessereact/server')
 const choosePorts = require('../lib/choosePorts')
 const createCompiler = require('../lib/createCompiler')
 const printInstructionsWhenReady = require('../lib/printInstructionsWhenReady')
-
-const isInteractive = process.stdout.isTTY
 
 let userConfig = {}
 try {
@@ -74,7 +72,7 @@ choosePorts(HOST, DEFAULT_PORT)
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
     const urls = prepareUrls(protocol, HOST, webpackPort)
     // Create a webpack compiler
-    const compiler = createCompiler(webpack, config, isInteractive)
+    const compiler = createCompiler(webpack, config, false)
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy
     const proxyConfig = prepareProxy(proxySetting, paths.appPublic)
@@ -89,16 +87,13 @@ choosePorts(HOST, DEFAULT_PORT)
       if (err) {
         return console.log(err)
       }
-      if (isInteractive) {
-        clearConsole()
-      }
       console.log(chalk.cyan('Starting Tessereact...\n'))
 
       const appName = require(paths.appPackageJson).name
       const tessereactServerUrls = prepareUrls(protocol, HOST, serverPort)
 
       // Configure webpack compiler with custom messages
-      printInstructionsWhenReady(compiler, appName, tessereactServerUrls, isInteractive)
+      printInstructionsWhenReady(compiler, appName, tessereactServerUrls, false)
 
       const tessereactConfig = Object.assign({}, {
         port: serverPort,
@@ -108,9 +103,7 @@ choosePorts(HOST, DEFAULT_PORT)
         chromedriverPort
       }, userConfig)
 
-      tessereactServer(process.cwd(), tessereactConfig, () => {
-        openBrowser(`http://localhost:${serverPort}`)
-      })
+      tessereactServer(process.cwd(), tessereactConfig)
     })
 
     const signals = ['SIGINT', 'SIGTERM']
