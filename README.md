@@ -3,6 +3,7 @@
 First, scaffold an app with create-react-app:
 
 ```sh
+npm install -g create-react-app
 create-react-app react-app
 cd react-app
 ```
