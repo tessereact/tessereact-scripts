@@ -11,12 +11,11 @@ cd react-app
 Second, install Tessereact packages:
 
 ```sh
-yarn add -D https://github.com/tessereact/tessereact.git
-yarn add -D https://github.com/tessereact/tessereact-scripts.git
+yarn add -D tessereact tessereact-scripts
 
 # or
 
-npm install --save-dev tessereact/tessereact tessereact/tessereact-scripts
+npm install --save-dev tessereact tessereact-scripts
 ```
 
 Third, add `tessereact` script to your package.json:
