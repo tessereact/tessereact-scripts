@@ -1,12 +1,12 @@
 {
   "name": "tessereact-scripts",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "main": "index.js",
   "author": "Eduard Tsech",
   "license": "MIT",
   "peerDependencies": {
     "react-scripts": "^1.0.11",
-    "tessereact": "*"
+    "tessereact": "^0.3.0"
   },
   "bin": {
     "tessereact-start": "./bin/tessereact-start.js",
