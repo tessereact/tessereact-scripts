@@ -1,41 +1,10 @@
-# The easiest way to integrate a react app with Tessereact:
+# tessereact-scripts
 
-First, scaffold an app with create-react-app:
+This is a package which makes the integration of [Tessereact](https://github.com/tessereact/tessereact)
+with [create-react-app](https://github.com/facebookincubator/create-react-app) easier.
 
-```sh
-npm install -g create-react-app
-create-react-app react-app
-cd react-app
-```
+See [this document](https://github.com/tessereact/tessereact/blob/master/docs/create-react-app-integration.md)
+for the complete installation instructions.
 
-Second, install Tessereact packages:
-
-```sh
-yarn add -D tessereact tessereact-scripts
-
-# or
-
-npm install --save-dev tessereact tessereact-scripts
-```
-
-Third, add `tessereact` script to your package.json:
-
-```js
-{
-  // ...
-  "scripts": {
-    // ...
-    "tessereact": "tessereact-start"
-  }
-}
-```
-
-Finally, run tessereact:
-
-```sh
-yarn tessereact
-
-# or
-
-npm run tessereact
-```
+See [tessereact-demo repository](https://github.com/tessereact/tessereact-demo)
+for a working example.
