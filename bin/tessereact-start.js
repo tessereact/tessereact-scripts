@@ -66,8 +66,8 @@ const HOST = process.env.HOST || '0.0.0.0'
 // We attempt to use the default port but if it is busy, we offer the user to
 // run on a different port. `detect()` Promise resolves to the next free port.
 choosePorts(HOST, DEFAULT_PORT)
-  .then(({webpackPort, serverPort, chromedriverPort}) => {
-    if (webpackPort == null || serverPort == null || chromedriverPort == null) {
+  .then(({webpackPort, serverPort}) => {
+    if (webpackPort == null || serverPort == null) {
       // We have not found a port.
       return
     }
@@ -103,9 +103,7 @@ choosePorts(HOST, DEFAULT_PORT)
       const tessereactConfig = Object.assign({}, {
         port: serverPort,
         snapshotsPath: 'snapshots',
-        entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js'),
-        cacheCSS: true,
-        chromedriverPort
+        entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js')
       }, userConfig)
 
       tessereactServer(process.cwd(), tessereactConfig, () => {
