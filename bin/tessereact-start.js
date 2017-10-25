@@ -103,7 +103,8 @@ choosePorts(HOST, DEFAULT_PORT)
       const tessereactConfig = Object.assign({}, {
         port: serverPort,
         snapshotsPath: 'snapshots',
-        entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js')
+        entryURL: url.resolve(urls.localUrlForBrowser, 'static/js/tessereact.js'),
+        staticURL: urls.localUrlForBrowser
       }, userConfig)
 
       tessereactServer(process.cwd(), tessereactConfig, () => {
